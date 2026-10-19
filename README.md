@@ -23,6 +23,14 @@ A single static ~13 MB binary, no Docker / Node.js / CGO.
 
 **Status:** stable. Compatible with Go 1.27+. Verified: `gofmt`, `go vet`, `go test -race`, `golangci-lint v2`, `govulncheck`.
 
+## How this was built
+
+I am not a Go expert by background. The implementation was generated with
+DeepSeek and MiniMax under my direction. My role: architecture, dependency
+selection, and code review, with extra attention to security-relevant parts.
+This was a deliberate exercise in reviewing AI-generated code. No formal
+security audit was performed. All code was reviewed and adapted before use.
+
 **Documentation — start here:**
 
 | | |
