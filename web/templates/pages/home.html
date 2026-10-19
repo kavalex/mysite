@@ -1,0 +1,10 @@
+{{ define "title" }}Home — MySite{{ end }}
+
+{{ define "content" }}
+<h1>Welcome{{ if .User }}, {{ .User.Username }}{{ end }}!</h1>
+<p>A minimal site on Go with the full set of modern security practices.</p>
+
+{{ if .Message }}
+<div class="alert alert-{{ .Message.Type }}" role="alert">{{ .Message.Text }}</div>
+{{ end }}
+{{ end }}

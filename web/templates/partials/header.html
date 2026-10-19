@@ -1,0 +1,16 @@
+{{ define "header" }}
+<header>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/about">About</a>
+    {{ if .User }}
+      <a href="/account">{{ .User.Username }}</a>
+      <form method="POST" action="/logout" class="inline">
+        <button type="submit">Sign out</button>
+      </form>
+    {{ else }}
+      <a href="/login">Sign in</a>
+    {{ end }}
+  </nav>
+</header>
+{{ end }}

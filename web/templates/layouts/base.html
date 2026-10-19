@@ -1,0 +1,33 @@
+{{ define "base" }}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ block "title" . }}MySite{{ end }}</title>
+  <meta name="description" content="{{ block "description" . }}A minimal site on Go{{ end }}">
+  {{ if .Canonical }}<link rel="canonical" href="{{ .Canonical }}">{{ end }}
+  {{ if .Nonce }}
+  <style nonce="{{ .Nonce }}">
+    /* Critical inline CSS. The rest is in /static/css/main.css */
+    body { margin: 0; }
+  </style>
+  {{ end }}
+  <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+  <a href="#main" class="skip">Skip to main content</a>
+  {{ template "header" . }}
+  <main id="main">
+    {{ template "content" . }}
+  </main>
+  {{ template "footer" . }}
+  {{ if .Nonce }}
+  <script nonce="{{ .Nonce }}">
+    // Progressive enhancement only. Site works without JS.
+    document.documentElement.classList.add('js');
+  </script>
+  {{ end }}
+</body>
+</html>
+{{ end }}

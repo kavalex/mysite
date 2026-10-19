@@ -1,0 +1,13 @@
+/dist/
+/data.db
+/data.db-*
+/data.db-journal
+/data.db-shm
+/data.db-wal
+/cover.out
+/server.log
+*.log
+.env
+.DS_Store
+.idea/
+.vscode/

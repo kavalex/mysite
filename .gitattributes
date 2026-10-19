@@ -1,0 +1,29 @@
+# Sane defaults: every text file uses LF, regardless of the OS that created it.
+*          text=auto eol=lf
+
+# Explicit text files (gives GitHub a clear hint about which files to diff).
+*.go       text
+*.html     text
+*.css      text
+*.js       text
+*.sql      text
+*.md       text
+*.yml      text eol=lf
+*.yaml     text eol=lf
+*.toml     text eol=lf
+*.json     text eol=lf
+Makefile   text eol=lf
+LICENSE    text eol=lf
+
+# Generated / vendored — exclude from language statistics and PR diffs.
+go.sum                 linguist-generated=true
+/dist/                 linguist-generated=true -text
+/web/static/           linguist-vendored=true
+*.ico                  binary
+
+# Tell GitHub to treat docs/ as documentation, not as code (better language stats).
+/docs/**               linguist-documentation
+/docs/**/*.md          docs-boundary
+
+# Internal helpers — still code, but counted separately if needed.
+/cmd/                  linguist-documentation=false

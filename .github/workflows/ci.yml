@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GOPROXY: https://proxy.golang.org,direct
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.27'
+          cache: true
+
+      - name: Install tools (pinned)
+        run: |
+          go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          go install golang.org/x/tools/cmd/goimports@latest
+
+      - name: Format check
+        run: |
+          out=$(gofmt -l .)
+          if [ -n "$out" ]; then echo "gofmt needs to run on:"; echo "$out"; exit 1; fi
+          out=$(goimports -l .)
+          if [ -n "$out" ]; then echo "goimports needs to run on:"; echo "$out"; exit 1; fi
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Modernize (go fix)
+        run: go fix ./...
+
+      - name: Test
+        run: go test -race -coverprofile=cover.out -covermode=atomic ./...
+
+      - name: Lint
+        run: golangci-lint run --timeout=5m
+
+      - name: Vulnerability scan
+        run: govulncheck ./...
+
+      - name: Build (static binary)
+        run: CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o dist/mysite .
+
+      - name: Smoke test
+        run: |
+          cp .env.example .env
+          ./dist/mysite > server.log 2>&1 &
+          SERVER_PID=$!
+          sleep 1
+          curl -s -o /dev/null -w 'healthz=%{http_code}\n' http://localhost:8080/healthz
+          curl -s -o /dev/null -w 'readyz=%{http_code}\n'  http://localhost:8080/readyz
+          curl -s -o /dev/null -w 'account=%{http_code}\n' http://localhost:8080/account
+          curl -s -X POST -H 'Sec-Fetch-Site: cross-site' \
+               -d 'email=x&password=y' -o /dev/null -w 'csrf_cross=%{http_code}\n' \
+               http://localhost:8080/login
+          kill $SERVER_PID 2>/dev/null || true
+          if grep -E '[5][0-9][0-9]' server.log; then
+            echo "Errors logged during smoke test"
+            exit 1
+          fi
